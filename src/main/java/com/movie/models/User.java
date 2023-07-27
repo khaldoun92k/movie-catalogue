@@ -1,11 +1,13 @@
 package com.movie.models;
 
+import java.util.Collection;
 import java.util.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -17,6 +19,9 @@ public class User {
 	private String userName;
 	private String password;
 	private Date createdAt;
+	
+	@OneToMany(mappedBy = "user")
+    private Collection<Rate> rate;
 
 	public User(String userName, String password, Date createdAt) {
 		this.userName = userName;

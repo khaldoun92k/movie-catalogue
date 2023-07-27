@@ -1,8 +1,11 @@
 package com.movie.models;
 
+import java.util.Collection;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Film {
@@ -14,6 +17,9 @@ public class Film {
 	private String genre;
 	private String director;
 
+	@OneToMany(mappedBy = "film")
+    private Collection<Rate> rate;
+	
 	public Film() {
 	}
 
