@@ -3,6 +3,7 @@ package com.movie.models;
 import java.util.Collection;
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,22 +12,28 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users") //user table name reserved by h2, Postgres... needs to be renamed 
+@Table(name = "users") // user table name reserved by h2, Postgres... needs to be renamed
 public class User {
-	
-	@Id @GeneratedValue
-	private  Long userId;
+
+	@Id
+	@GeneratedValue
+	private Long userId;
+	@Column(unique=true)
 	private String userName;
 	private String password;
-	private Date createdAt;
-	
-	@OneToMany(mappedBy = "user")
-    private Collection<Rate> rate;
+	private String role;
 
-	public User(String userName, String password, Date createdAt) {
+	private Date createdAt;
+
+	@OneToMany(mappedBy = "user")
+	private Collection<Rate> rate;
+
+	public User(String userName, String password, String role, Date createdAt) {
 		this.userName = userName;
 		this.password = password;
+		this.role = role;
 		this.createdAt = createdAt;
+
 	}
 
 	public User() {
@@ -56,6 +63,14 @@ public class User {
 		this.password = password;
 	}
 
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	public Date getCreatedAt() {
 		return createdAt;
 	}
@@ -66,9 +81,11 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User [userId=" + userId + ", userName=" + userName + ", password=" + password + ", createdAt="
-				+ createdAt + "]";
+		return "User [userId=" + userId + ", userName=" + userName + ", password=" + password + ", role=" + role
+				+ ", createdAt=" + createdAt + ", rate=" + rate + "]";
 	}
 
 	
+	
+
 }

@@ -23,8 +23,8 @@ public class LoadDatabase {
 	  CommandLineRunner initDatabase(UserRepository userRepository,FilmRepository filmRepository) {
 
 	    return args -> {
-	      log.info(PRELOADING+"{}",userRepository.save(new User("user1","pwd1",new Date())));
-	      log.info(PRELOADING+"{}",userRepository.save(new User("user2","pwd2",new Date())));
+	      log.info(PRELOADING+"{}",userRepository.save(new User("user1","pwd1","ROLE_USER",new Date())));
+	      log.info(PRELOADING+"{}",userRepository.save(new User("user2","pwd2","ROLE_USER",new Date())));
 	      
 	      log.info(PRELOADING+"{}",filmRepository.save(new Film("film1", "genre1", "director1")));
 	      log.info(PRELOADING+"{}",filmRepository.save(new Film("film2", "genre2", "director2")));

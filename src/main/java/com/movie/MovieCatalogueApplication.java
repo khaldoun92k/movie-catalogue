@@ -1,5 +1,6 @@
 package com.movie;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,6 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MovieCatalogueApplication {
 
+	public static void main(String[] args) {
+		SpringApplication.run(MovieCatalogueApplication.class, args);
+	}
+	
+	//To service the authenticate() function we need to add a new endpoint to the backend
+	 @RequestMapping("/users")
+	  public Principal user(Principal user) {
+	    return user;
+	  }
 	//Adding Dynamic Content to angular
 	  @RequestMapping("/resource")
 	  public Map<String,Object> home() {
@@ -21,9 +31,5 @@ public class MovieCatalogueApplication {
 	    model.put("content", "Hello World");
 	    return model;
 	  }
-	
-	public static void main(String[] args) {
-		SpringApplication.run(MovieCatalogueApplication.class, args);
-	}
 
 }
