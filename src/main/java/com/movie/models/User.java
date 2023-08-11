@@ -1,43 +1,56 @@
 package com.movie.models;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "users") // user table name reserved by h2, Postgres... needs to be renamed
-public class User {
+@Validated
+public class User implements UserDetails{
 
 	@Id
 	@GeneratedValue
 	private Long userId;
 	@Column(unique=true)
-	private String userName;
+	@NotBlank
+	@NotNull
+	private String username;
+	@NotNull
+	@NotBlank
 	private String password;
-	private String role;
-
+	@NotNull
+	private String role = "ROLE_USER";
 	private Date createdAt;
 
 	@OneToMany(mappedBy = "user")
 	private Collection<Rate> rate;
 
-	public User(String userName, String password, String role, Date createdAt) {
-		this.userName = userName;
+	public User(String username, String password) {
+		this.username = username;
 		this.password = password;
-		this.role = role;
-		this.createdAt = createdAt;
+		this.createdAt = new Date();
 
 	}
 
 	public User() {
 	}
+
 
 	public Long getUserId() {
 		return userId;
@@ -46,15 +59,15 @@ public class User {
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-
-	public String getUserName() {
-		return userName;
+	@Override
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
-
+	@Override
 	public String getPassword() {
 		return password;
 	}
@@ -79,13 +92,45 @@ public class User {
 		this.createdAt = createdAt;
 	}
 
-	@Override
-	public String toString() {
-		return "User [userId=" + userId + ", userName=" + userName + ", password=" + password + ", role=" + role
-				+ ", createdAt=" + createdAt + ", rate=" + rate + "]";
+	public Collection<Rate> getRate() {
+		return rate;
 	}
 
-	
-	
+	public void setRate(Collection<Rate> rate) {
+		this.rate = rate;
+	}
+
+	@Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> listRole = new ArrayList<GrantedAuthority>();
+
+        listRole.add(new SimpleGrantedAuthority(role)); 
+        return listRole;
+    }
+
+	@Override
+	public boolean isAccountNonExpired() {  //all info set to true for simplicity
+		return true; 
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", username=" + username + ", password=" + password + ", role=" + role
+				+ ", createdAt=" + createdAt + ", rate=" + rate + "]";
+	}
 
 }

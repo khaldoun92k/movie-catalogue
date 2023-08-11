@@ -2,6 +2,8 @@ package com.movie.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.movie.web.CustomAuthenticationProvider;
 
@@ -29,12 +35,13 @@ public class SecurityConfiguration {
         return http
                 .csrf(csrf -> csrf.disable()) // TODO CSRFs (Cross site request forgery) will be enabled later
                 .authorizeHttpRequests( auth -> auth
-                		.requestMatchers("/", "/index.html", "*.ico", "*.css", "*.js", "/login","/home").permitAll()
+                		.requestMatchers("/", "/index.html", "*.ico", "*.css", "*.js", "/login","/home","/register").permitAll()
                         .anyRequest().authenticated() // The user should be authenticated for any request in the application.
                 )
                 .authenticationProvider(authProvider)
                 //.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Spring Security will never create an HttpSession and it will never use it to obtain the Security Context (JWT case).
                 //.httpBasic(Customizer.withDefaults()) // Spring Security’s HTTP Basic Authentication support is enabled by default. However, as soon as any servlet-based configuration is provided, HTTP Basic must be explicitly provided.
+                
                 .build();
     }
 
@@ -45,6 +52,9 @@ public class SecurityConfiguration {
         authenticationManagerBuilder.authenticationProvider(authProvider);
         return authenticationManagerBuilder.build();
     }
+  
+     
+
     
     
   

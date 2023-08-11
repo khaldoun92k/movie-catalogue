@@ -16,7 +16,7 @@ import jakarta.annotation.Resource;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 	
 	@Resource
-	UserDetailsServiceImpl userDetailsService;
+	UserServiceImpl userDetailsService;
 
     @Override
 	public  Authentication authenticate(Authentication authentication)  

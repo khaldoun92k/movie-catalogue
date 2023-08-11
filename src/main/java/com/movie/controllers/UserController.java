@@ -70,7 +70,7 @@ public class UserController {
 	ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long id) {
 
 		User updatedUser=repository.findById(id).map(user -> {
-			user.setUserName(newUser.getUserName());
+			user.setUsername(newUser.getUsername());
 			user.setPassword(newUser.getPassword());
 			return repository.save(user);
 		}).orElseGet(() -> {
