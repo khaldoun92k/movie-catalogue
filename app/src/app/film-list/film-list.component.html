@@ -4,7 +4,7 @@
 
 <div class="center-screen">
 
-   
+
 
   <div class="film-table">
   <a [routerLink]="['/films/new']" mat-raised-button color="primary" class="add-film">Add Film</a>&nbsp;
@@ -32,13 +32,13 @@
     <!-- AvgRate Column -->
     <ng-container matColumnDef="AvgRate">
       <th mat-header-cell *matHeaderCellDef> AvgRate </th>
-      <td mat-cell *matCellDef="let film" > {{film.rateAvg | nanPipe}} </td> <!--The pipe is used is case no rates yet-->
-    
+      <td mat-cell *matCellDef="let film" > {{film.rateAvg | nanPipe | number : '1.2-2'}} </td> <!--The pipe is used is case no rates yet-->
+
     </ng-container>
 
     <!-- Delete/Edit buttons -->
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef > Actions </th> 
+      <th mat-header-cell *matHeaderCellDef > Actions </th>
       <td mat-cell *matCellDef="let film">
         <a (click)="openDialog(film)" mat-raised-button color="primary">Rate</a>&nbsp;
         <a [routerLink]="['../films', film.filmId ]" mat-raised-button color="primary">Edit</a>&nbsp;

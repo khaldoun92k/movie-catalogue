@@ -92,4 +92,6 @@ public class FilmController {
 		repository.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}
+	//TODO Add pagination for big data load
+	//TODO Add suggestion mechanism
 }
