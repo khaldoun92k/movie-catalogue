@@ -1,0 +1,8 @@
+.center-screen {
+    margin-top: 10%;
+    vertical-align: top;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }

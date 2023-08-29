@@ -1,0 +1,9 @@
+mat-card-content {
+    display: flex;
+    flex-direction: column;  /* ensures the children stack vertically */
+    align-items: stretch;  /* stretches the children to fill the width */
+}
+.half-width {
+    width: 50%;
+    display: block;
+  }

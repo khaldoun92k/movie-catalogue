@@ -1,0 +1,17 @@
+<mat-toolbar color="primary">
+<button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+  <mat-icon>more_vert</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item [disabled]="!isLoggedIn" routerLink="/films">
+    <span>Films</span>
+  </button>
+  <button mat-menu-item [disabled]="!isLoggedIn" routerLink="/users">
+    <span>Users</span>
+  </button>
+
+</mat-menu>
+<span>{{title}}</span>
+</mat-toolbar>
+
+<router-outlet></router-outlet>

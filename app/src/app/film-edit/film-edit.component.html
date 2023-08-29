@@ -1,0 +1,31 @@
+<mat-card>
+    <mat-card-content>
+<h2>Film Information</h2>
+<form *ngIf="film" #editForm="ngForm" (ngSubmit)="save()">
+  <mat-form-field class="half-width" *ngIf="film.filmId"><!-- only render the imput when there is a value -->
+    <mat-label>ID</mat-label>
+    <input matInput [(ngModel)]="film.filmId" id="id" name="id" placeholder="ID" disabled>
+  </mat-form-field>
+
+  <mat-form-field class="half-width">
+    <mat-label>Title</mat-label>
+    <input matInput [(ngModel)]="film.title" id="title" name="title" placeholder="Title" required>
+  </mat-form-field>
+
+  <mat-form-field class="half-width">
+    <mat-label>Genre</mat-label>
+    <input matInput [(ngModel)]="film.genre" id="genre" name="genre" placeholder="Genre" required>
+  </mat-form-field>
+
+  <mat-form-field class="half-width">
+    <mat-label>Director</mat-label>
+    <input matInput [(ngModel)]="film.director" id="name" name="name" placeholder="Name" required>
+  </mat-form-field>
+
+  <div class="button-row" >
+    <button type="submit" mat-raised-button color="primary" [disabled]="!editForm.form.valid" id="save">Save</button>
+    <button type="button" mat-button color="primary" (click)="cancel()" id="cancel">Cancel</button>
+  </div>
+</form>
+</mat-card-content>
+</mat-card>

@@ -3,6 +3,10 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+## angular ##
+**/app/dist/
+**/app/node/
+**/app/node_modules/
 
 ### STS ###
 .apt_generated

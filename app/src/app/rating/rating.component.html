@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>Movie title : {{film.title}}</h1>
+<div mat-dialog-content>
+  <p>Please rate the movie</p>
+  <mat-form-field>
+    <mat-label>Rating</mat-label>
+    <input matInput [(ngModel)]="rating">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button (click)="onClick()">Ok</button>
+</div>

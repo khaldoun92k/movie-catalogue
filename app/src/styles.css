@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.success-snackbar.mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-color: green ;
+    --mdc-snackbar-supporting-text-color: white ;
+    --mat-mdc-snack-bar-button-color: white ;
+    --mat-snack-bar-button-color: white;
+    white-space: pre-wrap
+  }
+  .fail-snackbar.mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-color: red ;
+    --mdc-snackbar-supporting-text-color: white ;
+    --mat-mdc-snack-bar-button-color: white ;
+    --mat-snack-bar-button-color: white;
+    white-space: pre-wrap
+  }

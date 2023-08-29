@@ -1,0 +1,36 @@
+.user-table {
+    width: 80%;
+    border:1px solid black;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top: 30px
+  }
+ 
+  .user-table th  {
+    height: 35px;
+    background-color: #3F51B5;
+    color: white;
+  }
+
+  .mat-column-userId,
+  .mat-column-username,
+  .mat-column-password,
+  .mat-column-role,
+  .mat-column-createdAt,
+  .mat-column-actions {
+    width: 32px;
+    border-right: 2px solid currentColor;
+    padding-right: 24px;
+    text-align: center;
+  }
+
+
+
+  .mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+  }
+  .mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+  }
