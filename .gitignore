@@ -7,7 +7,7 @@ target/
 **/app/dist/
 **/app/node/
 **/app/node_modules/
-
+**/app/.angular/
 ### STS ###
 .apt_generated
 .classpath
