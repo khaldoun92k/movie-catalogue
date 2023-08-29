@@ -4,94 +4,110 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.movie.controllers.assemblers.RateModelAssembler;
+import com.movie.controllers.exceptions.FilmNotFoundException;
 import com.movie.controllers.exceptions.RateNotFoundException;
 import com.movie.models.Film;
 import com.movie.models.Rate;
 import com.movie.models.User;
 import com.movie.models.keys.RateId;
+import com.movie.repositories.FilmRepository;
 import com.movie.repositories.RateRepository;
 
 @RestController
 public class RateController {
 
-	private final RateRepository repository;
+	final static Logger logger = LogManager.getLogger(RateController.class);
+	
+	@Autowired
+	private FilmRepository filmRepository;
+
+	@Autowired
+	private RateRepository rateRepository;
+	
 	private final RateModelAssembler assembler;
-	RateController(RateRepository repository,RateModelAssembler assembler) {
-		this.repository = repository;
+	
+	RateController(RateModelAssembler assembler) {
 		this.assembler=assembler;
 	}
+	record RatingRequest (Long filmId, Long rating){}
+	@CrossOrigin
+    @PostMapping("/rating")
+    public ResponseEntity<?> rateFilm(@RequestBody RatingRequest ratingRequest) {
+        Optional<Film> filmOpt = filmRepository.findById(ratingRequest.filmId);
+        
+        //getting the current user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!(auth instanceof AnonymousAuthenticationToken)) {
+	        String currentUserName = auth.getName();
+	        logger.info("currentUserName  {}" , currentUserName);
+	    }
+        var principal=SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        logger.info("Principal type: {}", principal.getClass().getName());
+        UserDetails userDetails =
+        		 (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentUser = (User)userDetails;
+       
+        if (!filmOpt.isPresent() || currentUser==null) {
+            return ResponseEntity.badRequest().body("Film or User not found!");
+        }
 
-	// Aggregate root
-	// tag::get-aggregate-root[]
+        Rate newRate = new Rate();
+        newRate.setRateId(new RateId(currentUser.getUserId(), filmOpt.get().getFilmId()));
+        newRate.setUser(currentUser);
+        newRate.setFilm(filmOpt.get());
+        newRate.setRating(ratingRequest.rating);
+
+        rateRepository.save(newRate);
+
+        return ResponseEntity.ok("Film rated successfully");
+    }
+    
 	@GetMapping("/rates")
 	public	CollectionModel<EntityModel<Rate>> all() {
-		List<EntityModel<Rate>> rates = repository.findAll().stream()
+		List<EntityModel<Rate>> rates = rateRepository.findAll().stream()
 			      .map(assembler::toModel)
 			      .collect(Collectors.toList());
 
-			  return CollectionModel.of(rates, linkTo(methodOn(RateController.class).all()).withSelfRel());
+			  return CollectionModel.of(rates, linkTo(methodOn(FilmController.class).all()).withSelfRel());
 	}
-	// end::get-aggregate-root[]
-	
-	@PostMapping("/rates")
-	ResponseEntity<?> newRate(@RequestBody Rate newRate) {	
-	
-		EntityModel<Rate> entityModel=assembler.toModel( repository.save(newRate));
-		return  ResponseEntity //Additionally, return the model-based version of the saved object.
-	      .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
-	      .body(entityModel);
-	}
-
 	// Single item
-	@GetMapping("/rates/{userId}/{filmId}")
-	public	EntityModel<Rate> one(@PathVariable("userId") Long userId,@PathVariable("filmId") Long filmId) {
-
-		RateId rateId = new RateId(userId, filmId);
-		Rate rate = repository.findById(rateId) //
-		      .orElseThrow(() -> new RateNotFoundException(rateId));
-
+	
+	@GetMapping("/rates/{id}")
+	public	EntityModel<Rate> one(@PathVariable RateId id) {
+		Rate rate = rateRepository.findById(id) //
+		      .orElseThrow(() -> new RateNotFoundException(id));
 		  return assembler.toModel(rate);
 		
 	}
-
-	@PutMapping("/rates/{userId}/{filmId}")
-	ResponseEntity<?> replaceRate(@RequestBody Rate newRate, @PathVariable("userId") Long userId,@PathVariable("filmId") Long filmId) {
-
-		RateId rateId = new RateId(userId, filmId);
-		Rate updatedRate = repository.findById(rateId)
-		.map(rate -> {
-			rate.setRating(newRate.getRating());
-			return repository.save(rate);
-		}).orElseGet(() -> {
-			newRate.setRateId(rateId);
-			return repository.save(newRate);
-		});
-		
-		EntityModel<Rate> entityModel = assembler.toModel(updatedRate);
-		return ResponseEntity //
-			      .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
-			      .body(entityModel);
+	@GetMapping("/rateAvg/{filmId}")
+	public	Double rateAvg(@PathVariable Long filmId) {
+		Film film = filmRepository.findById(filmId) //
+		      .orElseThrow(() -> new FilmNotFoundException(filmId));
+		//calculating average rating of a film
+		logger.info(film.getRate().stream().mapToDouble(Rate::getRating).average().orElse(Double.NaN));
+		return film.getRate().stream().mapToDouble(Rate::getRating).average().orElse(Double.NaN);
 	}
 
-	@DeleteMapping("/rates/{userId}/{filmId}")
-	ResponseEntity<?> deleteRate( @PathVariable("userId") Long userId,@PathVariable("filmId") Long filmId) {
-		RateId rateId = new RateId(userId, filmId);
-		repository.deleteById(rateId);
-		return ResponseEntity.noContent().build();
-	}
+
 }

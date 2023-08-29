@@ -1,7 +1,5 @@
 package com.movie.web;
 
-import java.util.ArrayList;
-
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,8 +30,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         if (!password.equals(user.getPassword())) {
             throw new BadCredentialsException("Authentication failed");
         }
-
-        return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>()); // If authentication succeeded, you need to return a fully initialized UsernamePasswordAuthenticationToken.
+        return new UsernamePasswordAuthenticationToken(user, password, user.getAuthorities());//use UserDetails as a principal
+        //If authentication succeeded, you need to return a fully initialized UsernamePasswordAuthenticationToken.
+        
     }
     
     @Override

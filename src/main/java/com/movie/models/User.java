@@ -3,13 +3,18 @@ package com.movie.models;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,16 +41,15 @@ public class User implements UserDetails{
 	private String password;
 	@NotNull
 	private String role = "ROLE_USER";
-	private Date createdAt;
-
-	@OneToMany(mappedBy = "user")
-	private Collection<Rate> rate;
+	@NotNull
+	private Date createdAt= new Date();
+	@JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	 private Set<Rate> rate=new HashSet<>();
 
 	public User(String username, String password) {
 		this.username = username;
 		this.password = password;
-		this.createdAt = new Date();
-
 	}
 
 	public User() {
@@ -92,11 +96,13 @@ public class User implements UserDetails{
 		this.createdAt = createdAt;
 	}
 
-	public Collection<Rate> getRate() {
+
+
+	public Set<Rate> getRate() {
 		return rate;
 	}
 
-	public void setRate(Collection<Rate> rate) {
+	public void setRate(Set<Rate> rate) {
 		this.rate = rate;
 	}
 

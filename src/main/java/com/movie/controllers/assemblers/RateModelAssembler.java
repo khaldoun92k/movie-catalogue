@@ -17,7 +17,7 @@ public class RateModelAssembler implements RepresentationModelAssembler<Rate, En
   public EntityModel<Rate> toModel(Rate rate) {
 
     return EntityModel.of(rate, //
-        linkTo(methodOn(RateController.class).one(rate.getRateId().getUser(),rate.getRateId().getFilm())).withSelfRel(), // add hypertext links to make it Restful
+        linkTo(methodOn(RateController.class).one(rate.getRateId())).withSelfRel(), // add hypertext links to make it Restful
         linkTo(methodOn(RateController.class).all()).withRel("rates"));
   }
 }

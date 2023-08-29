@@ -4,10 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
 import com.movie.models.User;
 import com.movie.web.UserServiceImpl;
+
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -48,7 +50,12 @@ public class LoginController {
 	    HttpSession session = attr.getRequest().getSession(true); 
 	    session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 	    
-	    logger.info("Session list  {}" , session);
+	    //logging current user
+	    if (!(authentication instanceof AnonymousAuthenticationToken)) {
+	        String currentUserName = authentication.getName();
+	        logger.info("currentUserName  {}" , currentUserName);
+	    }
+	    
 	    
 		// Normally return a JWT or some other token here but here it is using server based session
 		return ResponseEntity.ok("Authenticated successfully");

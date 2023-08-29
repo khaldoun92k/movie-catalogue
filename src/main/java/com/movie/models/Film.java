@@ -1,7 +1,11 @@
 package com.movie.models;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,9 +20,9 @@ public class Film {
 	private String title;
 	private String genre;
 	private String director;
-
-	@OneToMany(mappedBy = "film")
-    private Collection<Rate> rate;
+	@JsonIgnore
+	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
+    private Set<Rate> rate=new HashSet<>();
 	
 	public Film() {
 	}
@@ -59,6 +63,15 @@ public class Film {
 
 	public void setDirector(String director) {
 		this.director = director;
+	}
+
+	
+	public Set<Rate> getRate() {
+		return rate;
+	}
+
+	public void setRate(Set<Rate> rate) {
+		this.rate = rate;
 	}
 
 	@Override

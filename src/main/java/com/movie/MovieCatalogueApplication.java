@@ -17,9 +17,7 @@ public class MovieCatalogueApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MovieCatalogueApplication.class, args);
 	}
-	
-	
-	
+
 	//TODO Resource provider need to be handled
 	//To service the authenticate() function we need to add a new endpoint to the backend
 	 @RequestMapping("/users")
