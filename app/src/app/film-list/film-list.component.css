@@ -4,12 +4,15 @@
     margin-right:auto;
     margin-top: 30px
   }
-  .add-film {
+.add-film {
     float: right;
     margin-bottom: 10px;
   }
- 
-  .film-table th  {
+.search-film {
+     float: left;
+     margin-bottom: 10px;
+   }
+.film-table th  {
     height: 35px;
     background-color: #3F51B5;
     color: white;

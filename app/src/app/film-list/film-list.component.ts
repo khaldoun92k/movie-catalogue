@@ -1,10 +1,11 @@
 import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
-import {MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Film } from '../model/film';
 import { FilmService } from '../service/film-service.service';
 import { forkJoin, map, mergeMap, take } from 'rxjs';
 import { RatingComponent } from '../rating/rating.component';
+import { MatTableDataSource } from '@angular/material/table';
 
 
 //pipe to process Not yet rated case avg="Na"
@@ -14,7 +15,7 @@ import { RatingComponent } from '../rating/rating.component';
 })
 export class NanPipe implements PipeTransform {
   transform(value: number): number | string {
-    return isNaN(value) ? 'Not yet rated' : value;
+    return isNaN(value) ? 'Not yet rated' : value.toFixed(2); //return with 2 decimal
   }
 }
 
@@ -28,8 +29,7 @@ export class NanPipe implements PipeTransform {
 export class FilmListComponent implements OnInit {
 
   films: Film[];
-
-
+  dataSource: MatTableDataSource<Film>; //to be able to filter
   displayedColumns: string[] = ['filmId','title','genre','director','AvgRate', 'actions'];
   constructor(private filmService: FilmService,private snackBar: MatSnackBar,public dialog: MatDialog) {
   }
@@ -38,7 +38,7 @@ export class FilmListComponent implements OnInit {
         this.filmService.findAll().pipe(
           mergeMap((films) => {
             return forkJoin(
-              films.map((film) => 
+              films.map((film) =>
                 this.filmService.getFilmAverageRating(film.filmId).pipe(
                   take(1),
                   map((avgRating) => ({ ...film, rateAvg: avgRating }))
@@ -48,6 +48,7 @@ export class FilmListComponent implements OnInit {
           })
         ).subscribe((filmsWithAvgRating) => {
           this.films = filmsWithAvgRating;
+          this.dataSource = new MatTableDataSource(this.films);
         });
 
   }
@@ -66,7 +67,7 @@ export class FilmListComponent implements OnInit {
       });
     }
   }
-  
+
   //Rating dialog
   openDialog(film: Film): void {
     this.dialog.open(RatingComponent, {
@@ -75,7 +76,7 @@ export class FilmListComponent implements OnInit {
       this.ngOnInit();
     });
   }
-  
+
 
   //snackbarStandard function
   showSnackbarTopPosition(content, action, duration,color) {
@@ -83,8 +84,12 @@ export class FilmListComponent implements OnInit {
       duration: duration,
       verticalPosition: "top", // Allowed values are  'top' | 'bottom'
       horizontalPosition: "right", // Allowed values are 'start' | 'center' | 'end' | 'left' | 'right'
-      panelClass: [color] 
+      panelClass: [color]
     });
   }
+    applyFilter(event: Event) {
+      const filterValue = (event.target as HTMLInputElement).value;
+      this.dataSource.filter = filterValue.trim().toLowerCase();
+    }
 }
- 
+

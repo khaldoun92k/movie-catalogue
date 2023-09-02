@@ -4,11 +4,13 @@
 
 <div class="center-screen">
 
-
-
   <div class="film-table">
+    <mat-form-field class="search-film">
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Film title,director... " #input>
+    </mat-form-field>
   <a [routerLink]="['/films/new']" mat-raised-button color="primary" class="add-film">Add Film</a>&nbsp;
-  <table mat-table [dataSource]="films" class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" aria-describedby="List of available films">
     <!-- filmId Column -->
     <ng-container matColumnDef="filmId" >
       <th mat-header-cell *matHeaderCellDef class="header-color"> No. </th>
@@ -32,7 +34,7 @@
     <!-- AvgRate Column -->
     <ng-container matColumnDef="AvgRate">
       <th mat-header-cell *matHeaderCellDef> AvgRate </th>
-      <td mat-cell *matCellDef="let film" > {{film.rateAvg | nanPipe | number : '1.2-2'}} </td> <!--The pipe is used is case no rates yet-->
+      <td mat-cell *matCellDef="let film" > {{film.rateAvg | nanPipe}} </td> <!--The pipe is used is case no rates yet-->
 
     </ng-container>
 
