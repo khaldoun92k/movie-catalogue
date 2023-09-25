@@ -23,7 +23,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatListModule} from '@angular/material/list';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { RegisterService } from './service/register.service';
@@ -32,6 +32,7 @@ import { UserService } from './service/user-service.service';
 import { FilmEditComponent } from './film-edit/film-edit.component';
 import { RatingComponent } from './rating/rating.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { RecommendationComponent } from './recommendation/recommendation.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,7 +43,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     UserListComponent,
     FilmEditComponent,
     NanPipe,
-    RatingComponent
+    RatingComponent,
+    RecommendationComponent
   ],
   imports: [
     BrowserModule,
@@ -63,7 +65,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatOptionModule,
     MatListModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTooltipModule
   ],
   providers: [FilmService,UserService,RegisterService, provideAnimations()],
   bootstrap: [AppComponent]

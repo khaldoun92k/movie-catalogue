@@ -34,7 +34,7 @@
     <!-- AvgRate Column -->
     <ng-container matColumnDef="AvgRate">
       <th mat-header-cell *matHeaderCellDef> AvgRate </th>
-      <td mat-cell *matCellDef="let film" > {{film.rateAvg | nanPipe}} </td> <!--The pipe is used is case no rates yet-->
+      <td mat-cell *matCellDef="let film" > {{film.averageRating | nanPipe}} </td> <!--The pipe is used is case no rates yet-->
 
     </ng-container>
 
@@ -54,4 +54,12 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.row-is-clicked]></tr>
   </table>
 </div>
-  </div>
+</div>
+<div>
+
+</div>
+
+<ng-container>
+  <app-recommendation [parentData]="dataSource"></app-recommendation> <!-- Used onChange on child componant to reload -->
+</ng-container>
+

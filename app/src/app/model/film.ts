@@ -3,5 +3,5 @@ export class Film {
 	title:string;
 	genre:string;
 	director:string;
-	rateAvg:number;
+	averageRating:number;
 }

@@ -50,7 +50,7 @@ public class RateController {
 	RateController(RateModelAssembler assembler) {
 		this.assembler=assembler;
 	}
-	record RatingRequest (Long filmId, Long rating){}
+	private record RatingRequest (Long filmId, Long rating){}
 	@CrossOrigin
     @PostMapping("/rating")
     public ResponseEntity<?> rateFilm(@RequestBody RatingRequest ratingRequest) {
@@ -92,21 +92,12 @@ public class RateController {
 			  return CollectionModel.of(rates, linkTo(methodOn(FilmController.class).all()).withSelfRel());
 	}
 	// Single item
-	
 	@GetMapping("/rates/{id}")
 	public	EntityModel<Rate> one(@PathVariable RateId id) {
 		Rate rate = rateRepository.findById(id) //
 		      .orElseThrow(() -> new RateNotFoundException(id));
 		  return assembler.toModel(rate);
 		
-	}
-	@GetMapping("/rateAvg/{filmId}")
-	public	Double rateAvg(@PathVariable Long filmId) {
-		Film film = filmRepository.findById(filmId) //
-		      .orElseThrow(() -> new FilmNotFoundException(filmId));
-		//calculating average rating of a film
-		logger.info(film.getRate().stream().mapToDouble(Rate::getRating).average().orElse(Double.NaN));
-		return film.getRate().stream().mapToDouble(Rate::getRating).average().orElse(Double.NaN);
 	}
 
 

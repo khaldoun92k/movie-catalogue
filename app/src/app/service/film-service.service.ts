@@ -7,13 +7,11 @@ import { Observable, Subscriber, map, tap } from 'rxjs';
 export class FilmService {
 
   private filmsUrl: string;
-  private avgRatingUrl: string;
   private ratingUrl: string;
 
   constructor(public http: HttpClient) {
     this.filmsUrl = '/films';
-    this.avgRatingUrl ='/rateAvg'
-    this.ratingUrl='/rating'
+    this.ratingUrl= '/rating';
   }
 
 
@@ -23,9 +21,6 @@ export class FilmService {
       map(response => response._embedded?.filmList || [])); //?. If _embedded is null or undefined, it won't throw an error
   }                                                         // If filmList is undefined or any falsy value, it will return an empty array ([]).
 
-  public getFilmAverageRating(filmId: number): Observable<number> {
-    return this.http.get<number>(this.avgRatingUrl+"/"+filmId);
-  }
 
   public rateFilm(film: Film, rating: number): void {
     let filmId= film.filmId;

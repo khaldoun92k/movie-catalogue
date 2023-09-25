@@ -6,9 +6,11 @@ import { FilmListComponent } from './film-list/film-list.component';
 import { RegisterComponent } from './register/register.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { FilmEditComponent } from './film-edit/film-edit.component';
+import { RecommendationComponent } from './recommendation/recommendation.component';
 
 
 const routes: Routes = [
+  { path: 'film/recommendations', component: RecommendationComponent},
   { path: 'users', component: UserListComponent},
   { path: 'films', component: FilmListComponent},
   { path: 'films/:id',  component: FilmEditComponent},

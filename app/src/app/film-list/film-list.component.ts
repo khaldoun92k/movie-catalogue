@@ -1,11 +1,11 @@
-import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
+import { Component, OnInit, Pipe, PipeTransform,ViewChild } from '@angular/core';
+import { MatDialog} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Film } from '../model/film';
 import { FilmService } from '../service/film-service.service';
-import { forkJoin, map, mergeMap, take } from 'rxjs';
 import { RatingComponent } from '../rating/rating.component';
 import { MatTableDataSource } from '@angular/material/table';
+import { RecommendationComponent } from '../recommendation/recommendation.component';
 
 
 //pipe to process Not yet rated case avg="Na"
@@ -27,31 +27,21 @@ export class NanPipe implements PipeTransform {
 )
 
 export class FilmListComponent implements OnInit {
-
-  films: Film[];
+  @ViewChild(RecommendationComponent) recommendationComponent: RecommendationComponent;
   dataSource: MatTableDataSource<Film>; //to be able to filter
   displayedColumns: string[] = ['filmId','title','genre','director','AvgRate', 'actions'];
   constructor(private filmService: FilmService,private snackBar: MatSnackBar,public dialog: MatDialog) {
   }
-  /*call the getFilmAverageRating method for every movie to get its avg*/
-  ngOnInit() {
-        this.filmService.findAll().pipe(
-          mergeMap((films) => {
-            return forkJoin(
-              films.map((film) =>
-                this.filmService.getFilmAverageRating(film.filmId).pipe(
-                  take(1),
-                  map((avgRating) => ({ ...film, rateAvg: avgRating }))
-                )
-              )
-            );
-          })
-        ).subscribe((filmsWithAvgRating) => {
-          this.films = filmsWithAvgRating;
-          this.dataSource = new MatTableDataSource(this.films);
-        });
 
+  ngOnInit() {
+       
+        this.filmService.findAll().subscribe((films) => {
+          this.dataSource = new MatTableDataSource(films);
+        });
+     
   }
+
+
   delete(film: Film): void {
     if (confirm(`Are you sure you want to delete ${film.title}?`)) {
       this.filmService.http.delete(`films/${film.filmId}`).subscribe({
@@ -73,12 +63,13 @@ export class FilmListComponent implements OnInit {
     this.dialog.open(RatingComponent, {
       data: film
     }).afterClosed().subscribe(result => {
-      this.ngOnInit();
+      this.ngOnInit();  
+
     });
   }
 
 
-  //snackbarStandard function
+  //SnackbarStandard function
   showSnackbarTopPosition(content, action, duration,color) {
     this.snackBar.open(content, action, {
       duration: duration,

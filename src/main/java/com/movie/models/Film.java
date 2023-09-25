@@ -20,6 +20,7 @@ public class Film {
 	private String title;
 	private String genre;
 	private String director;
+	private Double averageRating;
 	@JsonIgnore
 	@OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
     private Set<Rate> rate=new HashSet<>();
@@ -31,6 +32,7 @@ public class Film {
 		this.title = title;
 		this.genre = genre;
 		this.director = director;
+		this.averageRating = Double.NaN;
 	}
 
 	public Long getFilmId() {
@@ -65,7 +67,14 @@ public class Film {
 		this.director = director;
 	}
 
-	
+	public Double getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(Double averageRating) {
+		this.averageRating = averageRating;
+	}
+
 	public Set<Rate> getRate() {
 		return rate;
 	}
@@ -76,7 +85,12 @@ public class Film {
 
 	@Override
 	public String toString() {
-		return "Film [filmId=" + filmId + ", title=" + title + ", genre=" + genre + ", director=" + director + "]";
+		return "Film{" +
+				"filmId=" + filmId +
+				", title='" + title + '\'' +
+				", genre='" + genre + '\'' +
+				", director='" + director + '\'' +
+				", AverageRating=" + averageRating +
+				'}';
 	}
-
 }
