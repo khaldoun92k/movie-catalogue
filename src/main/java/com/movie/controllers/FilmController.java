@@ -3,7 +3,6 @@ package com.movie.controllers;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,9 +10,11 @@ import java.util.stream.Collectors;
 
 import com.movie.models.Rate;
 import com.movie.models.User;
+import com.movie.services.FilmService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,13 +34,13 @@ import com.movie.repositories.FilmRepository;
 @RestController
 public class FilmController {
 
-	private final FilmRepository repository;
+	//private final FilmRepository repository;
 	private final FilmModelAssembler assembler;
-
+	private final FilmService filmService;
 	// In-memory storage for films ;Using ConcurrentHashMap ensures safe concurrent access, making it a preferred choice for multithreaded applications, like web applications developed using Spring Boot.
 	private final Map<Long, Film> inMemoryFilms = new ConcurrentHashMap<>();
-	FilmController(FilmRepository repository,FilmModelAssembler assembler) {
-		this.repository = repository;
+	public FilmController(FilmService filmService, FilmModelAssembler assembler) {
+		this.filmService=filmService;
 		this.assembler=assembler;
 	}
 
@@ -49,14 +50,14 @@ public class FilmController {
 	// tag::get-aggregate-root[]
 	@GetMapping("/films")
 	public	CollectionModel<EntityModel<Film>> all() {
-		List<Film> allFilms = repository.findAll();
+		List<Film> allFilms = filmService.getAllFilms();
 		//calculating average rating
 		allFilms.forEach(film->{
 				film.setAverageRating(film.getRate().stream().mapToDouble(Rate::getRating).average().orElse(Double.NaN));
 				inMemoryFilms.put(film.getFilmId(), film);
 	});
 		//wrapping model
-		List<EntityModel<Film>> films = repository.findAll().stream().map(assembler::toModel)
+		List<EntityModel<Film>> films = allFilms.stream().map(assembler::toModel)
 				.collect(Collectors.toList());
 			  return CollectionModel.of(films, linkTo(methodOn(FilmController.class).all()).withSelfRel());
 	}
@@ -64,8 +65,7 @@ public class FilmController {
 	
 	@PostMapping("/films")
 	ResponseEntity<?> newFilm(@RequestBody Film newFilm) {
-
-		EntityModel<Film> entityModel=assembler.toModel( repository.save(newFilm));
+		EntityModel<Film> entityModel=assembler.toModel( filmService.saveFilm(newFilm));
 		return  ResponseEntity //Additionally, return the model-based version of the saved object.
 	      .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
 	      .body(entityModel);
@@ -74,9 +74,7 @@ public class FilmController {
 	// Single item
 	@GetMapping("/films/{id}")
 	public	EntityModel<Film> one(@PathVariable Long id) {
-
-
-		Film film = repository.findById(id) //
+		Film film = filmService.getFilmById(id) //
 		      .orElseThrow(() -> new FilmNotFoundException(id));
 		Double averageRating=film.getRate().stream().mapToDouble(Rate::getRating).average().orElse(Double.NaN);
 		film.setAverageRating(averageRating);
@@ -86,17 +84,16 @@ public class FilmController {
 
 	@PutMapping("/films/{id}")
 	ResponseEntity<?> replaceFilm(@RequestBody Film newFilm, @PathVariable Long id) {
-
-		Film updatedFilm = repository.findById(id)
+		Film updatedFilm = filmService.getFilmById(id)
 		.map(film -> {
 			film.setTitle(newFilm.getTitle());
 			film.setDirector(newFilm.getDirector());
 			film.setGenre(newFilm.getGenre());
 			film.setAverageRating(Double.NaN);
-			return repository.save(film);
+			return filmService.updateFilm(film);
 		}).orElseGet(() -> {
 			newFilm.setFilmId(id);
-			return repository.save(newFilm);
+			return filmService.saveFilm(newFilm);
 		});
 		
 		EntityModel<Film> entityModel = assembler.toModel(updatedFilm);
@@ -107,8 +104,8 @@ public class FilmController {
 
 	@DeleteMapping("/films/{id}")
 	ResponseEntity<?> deleteFilm(@PathVariable Long id) {
-		repository.deleteById(id);
-		return ResponseEntity.noContent().build();
+		filmService.deleteFilm(id);
+		return new ResponseEntity<String>("Film deleted successfully!.", HttpStatus.OK);
 	}
 	//TODO Add suggestion mechanism
 	@GetMapping("/film/recommendations")

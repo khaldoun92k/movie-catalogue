@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.movie.services.impl.UserServiceImpl;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -26,11 +27,11 @@ import com.movie.repositories.UserRepository;
 @RestController
 public class UserController {
 
-	private final UserRepository repository;
+	private final UserServiceImpl userService;
 	private final UserModelAssembler assembler;
 
-	UserController(UserRepository repository,UserModelAssembler assembler) {
-		this.repository = repository;
+	public UserController(UserServiceImpl userService,UserModelAssembler assembler) {
+		this.userService = userService;
 		this.assembler = assembler;
 	}
 
@@ -38,7 +39,7 @@ public class UserController {
 	// tag::get-aggregate-root[]
 	@GetMapping("/users")
 	public	CollectionModel<EntityModel<User>> all() {
-		List<EntityModel<User>> users = repository.findAll().stream()
+		List<EntityModel<User>> users = userService.getAllUsers().stream()
 			      .map(assembler::toModel)
 			      .collect(Collectors.toList());
 
@@ -48,7 +49,7 @@ public class UserController {
 
 	@PostMapping("/users")
 	ResponseEntity<?> newUser(@RequestBody User newUser) {
-		EntityModel<User> entityModel=assembler.toModel( repository.save(newUser));
+		EntityModel<User> entityModel=assembler.toModel( userService.saveUser(newUser));
 		return  ResponseEntity //Additionally, return the model-based version of the saved object.
 	      .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
 	      .body(entityModel);
@@ -59,7 +60,7 @@ public class UserController {
 	public	EntityModel<User> one(@PathVariable Long id) {
 
 
-		User user = repository.findById(id) //
+		User user = userService.getUserById(id) //
 		      .orElseThrow(() -> new UserNotFoundException(id));
 
 		  return assembler.toModel(user);
@@ -69,13 +70,13 @@ public class UserController {
 	@PutMapping("/users/{id}")
 	ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long id) {
 
-		User updatedUser=repository.findById(id).map(user -> {
+		User updatedUser=userService.getUserById(id).map(user -> {
 			user.setUsername(newUser.getUsername());
 			user.setPassword(newUser.getPassword());
-			return repository.save(user);
+			return userService.updateUser(user);
 		}).orElseGet(() -> {
 			newUser.setUserId(id);
-			return repository.save(newUser);
+			return userService.updateUser(newUser);
 		});
 		EntityModel<User> entityModel = assembler.toModel(updatedUser);
 		return ResponseEntity //
@@ -85,7 +86,7 @@ public class UserController {
 
 	@DeleteMapping("/users/{id}")
 	ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		repository.deleteById(id);
+		userService.deleteUser(id);
 		return ResponseEntity.noContent().build();
 	}
 	

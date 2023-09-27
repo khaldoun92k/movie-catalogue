@@ -1,5 +1,6 @@
 package com.movie.web;
 
+import com.movie.services.impl.UserServiceImpl;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,7 +15,7 @@ import jakarta.annotation.Resource;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 	
 	@Resource
-	UserServiceImpl userDetailsService;
+    UserServiceImpl userDetailsService;
 
     @Override
 	public  Authentication authenticate(Authentication authentication)  

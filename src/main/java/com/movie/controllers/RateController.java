@@ -1,15 +1,16 @@
 package com.movie.controllers;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.movie.controllers.assemblers.RateModelAssembler;
+import com.movie.controllers.exceptions.RateNotFoundException;
+import com.movie.models.Film;
+import com.movie.models.Rate;
+import com.movie.models.User;
+import com.movie.models.keys.RateId;
+import com.movie.services.impl.FilmServiceImpl;
+import com.movie.services.impl.RateServiceImpl;
+import com.movie.services.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -17,44 +18,36 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.movie.controllers.assemblers.RateModelAssembler;
-import com.movie.controllers.exceptions.FilmNotFoundException;
-import com.movie.controllers.exceptions.RateNotFoundException;
-import com.movie.models.Film;
-import com.movie.models.Rate;
-import com.movie.models.User;
-import com.movie.models.keys.RateId;
-import com.movie.repositories.FilmRepository;
-import com.movie.repositories.RateRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class RateController {
 
-	final static Logger logger = LogManager.getLogger(RateController.class);
-	
-	@Autowired
-	private FilmRepository filmRepository;
-
-	@Autowired
-	private RateRepository rateRepository;
-	
+	private final static Logger logger = LogManager.getLogger(RateController.class);
+	private final FilmServiceImpl filmService;
+	private final RateServiceImpl rateService;
 	private final RateModelAssembler assembler;
-	
-	RateController(RateModelAssembler assembler) {
-		this.assembler=assembler;
+
+	RateController(FilmServiceImpl filmService, RateServiceImpl rateService, RateModelAssembler assembler) {
+		this.rateService = rateService;
+		this.filmService = filmService;
+		this.assembler = assembler;
 	}
+
+	//record will be used for rating requests
 	private record RatingRequest (Long filmId, Long rating){}
+
 	@CrossOrigin
     @PostMapping("/rating")
     public ResponseEntity<?> rateFilm(@RequestBody RatingRequest ratingRequest) {
-        Optional<Film> filmOpt = filmRepository.findById(ratingRequest.filmId);
+		Optional<Film> filmOpt = filmService.getFilmById(ratingRequest.filmId);
         
         //getting the current user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -68,7 +61,7 @@ public class RateController {
         		 (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = (User)userDetails;
        
-        if (!filmOpt.isPresent() || currentUser==null) {
+        if (filmOpt.isEmpty() || currentUser==null) {
             return ResponseEntity.badRequest().body("Film or User not found!");
         }
 
@@ -77,28 +70,24 @@ public class RateController {
         newRate.setUser(currentUser);
         newRate.setFilm(filmOpt.get());
         newRate.setRating(ratingRequest.rating);
-
-        rateRepository.save(newRate);
+		rateService.saveRate(newRate);
 
         return ResponseEntity.ok("Film rated successfully");
     }
     
 	@GetMapping("/rates")
 	public	CollectionModel<EntityModel<Rate>> all() {
-		List<EntityModel<Rate>> rates = rateRepository.findAll().stream()
+		List<EntityModel<Rate>> rates = rateService.getAllRates().stream()
 			      .map(assembler::toModel)
 			      .collect(Collectors.toList());
-
-			  return CollectionModel.of(rates, linkTo(methodOn(FilmController.class).all()).withSelfRel());
+		return CollectionModel.of(rates, linkTo(methodOn(FilmController.class).all()).withSelfRel());
 	}
 	// Single item
 	@GetMapping("/rates/{id}")
 	public	EntityModel<Rate> one(@PathVariable RateId id) {
-		Rate rate = rateRepository.findById(id) //
+		Rate rate = rateService.getRateById(id) //
 		      .orElseThrow(() -> new RateNotFoundException(id));
-		  return assembler.toModel(rate);
-		
+		return assembler.toModel(rate);
 	}
-
 
 }
