@@ -51,7 +51,7 @@ export class FilmListComponent implements OnInit {
             this.ngOnInit();
           }, 1000);
         },
-        error: () => {
+        error: (err) => {
           this.showSnackbarTopPosition('Error deleting.','Done','5000','fail-snackbar');
         }
       });

@@ -105,7 +105,8 @@ public class FilmController {
 	@DeleteMapping("/films/{id}")
 	ResponseEntity<?> deleteFilm(@PathVariable Long id) {
 		filmService.deleteFilm(id);
-		return new ResponseEntity<String>("Film deleted successfully!.", HttpStatus.OK);
+		//Returns a 204 No Content status, which is semantically appropriate for a DELETE
+		return ResponseEntity.noContent().build();
 	}
 	//TODO Add suggestion mechanism
 	@GetMapping("/film/recommendations")
