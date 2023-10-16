@@ -1,71 +1,96 @@
 package com.movie.controllers;
 
-import com.movie.LoadDatabase;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.movie.config.TestConfig;
 import com.movie.controllers.assemblers.UserModelAssembler;
 import com.movie.models.User;
 import com.movie.repositories.UserRepository;
-import org.junit.Before;
+import com.movie.services.impl.UserServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.core.Is.is;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@RunWith(SpringRunner.class)
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
+
+/**
+ * Testing the interaction between the UserController and UserRepository layers.
+ * It tests the controller's ability to handle HTTP requests and generate responses correctly,
+ * and it also tests the repository's ability to interact with the database as expected when called by the controller.
+ * **/
+@Import(TestConfig.class)
+@WithMockUser(username="admin",roles = "ADMIN")
 @WebMvcTest(UserController.class)
 class UserControllerTest {
     private static final Logger log = LoggerFactory.getLogger(UserControllerTest.class);
-    @Autowired
-    private MockMvc mvc;
     @MockBean
-    private UserController userController;
-
+    private UserRepository userRepository;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
+    private UserServiceImpl userService;
     @MockBean
     private UserModelAssembler assembler;
 
-    private  UserRepository userRepository;
-    @Before
+    //@BeforeEach for junit 5 (@before is junit 4)
+    @BeforeEach
     void init(){
-        //creating test users
-        log.info("Creating TEST USER {}",userRepository.save(new User("testUsername1","testPassword1")));
+        //log.info("Adding test user {}",userRepository.save(new User("testUser","testPwd")));
     }
 
     @Test
-    void all() {
+    void shouldReturnAllUsers() {
+
     }
 
     @Test
-    void newUser() {
+    void shouldCreateUser() throws Exception  {
+        User user = new User("newUsername","newPassword");
+        // Log the security context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Mock user: {}", authentication.isAuthenticated());
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isCreated())
+                .andDo(print());
+
     }
 
     @Test
-    void one() throws Exception {
-    /*    given(userController.one(user.getUserId())).willReturn(assembler.toModel(user));
+    void shouldReturnUser() {
 
-        mvc.perform(get("/users/"+user.getUserId())
-                        .with(user("usernameTest").password("passwordTest"))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("user", is(user.getUsername())));*/
+
     }
 
     @Test
-    void replaceUser() {
+    void shouldUpdateUser() {
     }
 
     @Test
-    void deleteUser() {
+    void shouldDeleteUser() {
     }
 }

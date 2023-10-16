@@ -15,13 +15,12 @@
 	<name>movie-catalogue</name>
 	<description>movie catalogue project for Spring Boot</description>
 	<properties>
-		<java.version>20</java.version>
+		<java.version>21</java.version>
 		<frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
         <node.version>v18.16.0</node.version><!-- download and install node+npm on your machine-->
         <npm.version>9.5.1</npm.version>
 	</properties>
 	<dependencies>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -80,6 +79,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
