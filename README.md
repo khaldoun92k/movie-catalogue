@@ -1,6 +1,4 @@
-# Movie-catalogue (Challenge)
-Build a web application consisting of persistence layer, business logic, RESTful API. and a web frontend.
-The application should be a mini-MVP of an IMDB application.
+ 
 # Requirements
 Here is a list of requirements/acceptance criteria for the IMDB application (also serves as check list).
 

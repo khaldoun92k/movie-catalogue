@@ -96,8 +96,6 @@ public class User implements UserDetails{
 		this.createdAt = createdAt;
 	}
 
-
-
 	public Set<Rate> getRate() {
 		return rate;
 	}
@@ -105,7 +103,7 @@ public class User implements UserDetails{
 	public void setRate(Set<Rate> rate) {
 		this.rate = rate;
 	}
-
+	@JsonIgnore
 	@Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> listRole = new ArrayList<GrantedAuthority>();
@@ -113,22 +111,22 @@ public class User implements UserDetails{
         listRole.add(new SimpleGrantedAuthority(role)); 
         return listRole;
     }
-
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {  //all info set to true for simplicity
 		return true; 
 	}
-
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
 		return true;
 	}
-
+	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
-
+	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
 		return true;

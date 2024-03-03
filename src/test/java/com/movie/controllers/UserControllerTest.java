@@ -7,6 +7,7 @@ import com.movie.controllers.assemblers.UserModelAssembler;
 import com.movie.models.User;
 import com.movie.repositories.UserRepository;
 import com.movie.services.impl.UserServiceImpl;
+import org.apache.catalina.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -63,23 +66,29 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldReturnAllUsers() {
+    void shouldReturnAllUsers() throws Exception {
 
+
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
     void shouldCreateUser() throws Exception  {
         User user = new User("newUsername","newPassword");
+        user.setUserId(50L);
+        String jsonUser=objectMapper.writeValueAsString(user);
         // Log the security context
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Mock user: {}", authentication.isAuthenticated());
+        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //log.info("Mock user: {}", authentication.isAuthenticated());
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                 .content(jsonUser))
                 .andExpect(status().isCreated())
                 .andDo(print());
 
     }
-
+/*
     @Test
     void shouldReturnUser() {
 
@@ -92,5 +101,5 @@ class UserControllerTest {
 
     @Test
     void shouldDeleteUser() {
-    }
+    }*/
 }
