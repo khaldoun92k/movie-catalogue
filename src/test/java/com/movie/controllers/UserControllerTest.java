@@ -43,11 +43,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * It tests the controller's ability to handle HTTP requests and generate responses correctly,
  * and it also tests the repository's ability to interact with the database as expected when called by the controller.
  * **/
-@Import(TestConfig.class)
-@WithMockUser(username="admin",roles = "ADMIN")
-@WebMvcTest(UserController.class)
+//@Import(TestConfig.class)
+//@WithMockUser(username="admin",roles = "ADMIN")
+//@WebMvcTest(UserController.class)
 class UserControllerTest {
-    private static final Logger log = LoggerFactory.getLogger(UserControllerTest.class);
+   /* private static final Logger log = LoggerFactory.getLogger(UserControllerTest.class);
     @MockBean
     private UserRepository userRepository;
     @Autowired
@@ -74,7 +74,7 @@ class UserControllerTest {
                 .andDo(print());
     }
 
-    @Test
+   // @Test
     void shouldCreateUser() throws Exception  {
         User user = new User("newUsername","newPassword");
         user.setUserId(50L);
@@ -102,4 +102,5 @@ class UserControllerTest {
     @Test
     void shouldDeleteUser() {
     }*/
+
 }

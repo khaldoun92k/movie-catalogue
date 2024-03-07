@@ -17,9 +17,15 @@ Here is a list of requirements/acceptance criteria for the IMDB application (als
 Choose your focus wisely. Delivering complete functionality with high standard over full functionality with low quality is preferred.
 
 # Installation
-On first installation run maven goal : "mvn spring-boot:run -Pprod"
-to install npm and node for the first time.
-"mvn spring-boot:run" afterward to run.
+## IDE installation/Run
+On first installation run maven goal to install npm and node for the first time: "mvn spring-boot:run -Pprod"
+Afterward to run: "mvn spring-boot:run"
+## Docker Image/Container run
+requirement: Docker Desktop installed
+Create docker image via spring boot packet builder: mvn spring-boot:build-image -P prod -DskipTests
+Run the image on a container locally: docker run -d -p 8080:8080 movie-catalogue:0.0.1-SNAPSHOT --name movie1
+
+
 
 # Miscellaneous
 - CSRFs (Cross site request forgery) are typically conducted using malicious social engineering, such as an email or link that tricks the victim into sending a forged request to a server. As the unsuspecting user is authenticated by their application at the time of the attack, it’s impossible to distinguish a legitimate request from a forged one.
