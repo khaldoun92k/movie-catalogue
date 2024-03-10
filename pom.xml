@@ -19,7 +19,7 @@
 		<frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
         <node.version>v18.16.0</node.version><!-- download and install node+npm on your machine-->
         <npm.version>9.5.1</npm.version>
-	</properties>
+    </properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -96,7 +96,7 @@
                     <docker>
                         <publishRegistry>
                             <username>khaldoun92k</username>
-                            <password>${env.GIT_PACKM}</password>
+                            <password>${my.secret}</password>
                             <url>https://ghcr.io</url>
                         </publishRegistry>
                     </docker>
