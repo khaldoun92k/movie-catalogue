@@ -84,6 +84,24 @@
                     <target>21</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.2.3</version>
+                <configuration>
+                    <image>
+                        <name>ghcr.io/khaldoun92k/movie-catalogue/movie-catalogue:latest</name>
+                        <publish>true</publish>
+                    </image>
+                    <docker>
+                        <publishRegistry>
+                            <username>khaldoun92k</username>
+                            <password>${env.GIT_PACKM}</password>
+                            <url>https://ghcr.io</url>
+                        </publishRegistry>
+                    </docker>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -174,5 +192,4 @@
             </properties>
         </profile>
     </profiles>
-
 </project>
