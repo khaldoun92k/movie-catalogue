@@ -23,7 +23,7 @@ Afterward to run: "mvn spring-boot:run"
 ## Docker Image/Container run
 requirement: Docker Desktop installed
 Create docker image via spring boot packet builder: mvn spring-boot:build-image -P prod -DskipTests
-Run the image on a container locally: docker run -d -p 8080:8080 movie-catalogue:0.0.1-SNAPSHOT --name movie1
+Run the image on a container locally: docker run -d -p 8080:8080 movie-catalogue:0.0.1-SNAPSHOT --name movie1 
 
 
 
