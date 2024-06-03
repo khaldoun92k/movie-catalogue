@@ -18,11 +18,23 @@ Choose your focus wisely. Delivering complete functionality with high standard o
 
 # Installation
 ## IDE installation/Run
-On first installation run maven goal to install npm and node for the first time: "mvn spring-boot:run -Pprod"
-Afterward to run: "mvn spring-boot:run"
+On first installation:
+
+> mvn spring-boot:run -Pprod (run maven goal to install npm and node)
+
+Afterward to run:
+
+> mvn spring-boot:run 
 ## Docker Image/Container run
-requirement: Docker Desktop installed
-Create docker image (fat image which contain the backend and the frontend) via spring boot packet builder: mvn spring-boot:build-image -P prod -DskipTests
-Run the image on a container locally: docker run -d -p 8080:8080 movie-catalogue:0.0.1-SNAPSHOT --name movie1 
+**requirement: Docker Desktop installed** 
+
+Create docker image (fat image which contain the backend and the frontend) via spring boot packet builder: 
+
+> mvn spring-boot:build-image -P prod -DskipTests
+
+Run the image on a container locally: 
+
+> docker run -d -p 8080:8080 --name movie1 ghcr.io/khaldoun92k/movie-catalogue/movie-catalogue:latest
+ 
 
 

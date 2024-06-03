@@ -43,64 +43,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * It tests the controller's ability to handle HTTP requests and generate responses correctly,
  * and it also tests the repository's ability to interact with the database as expected when called by the controller.
  * **/
-//@Import(TestConfig.class)
-//@WithMockUser(username="admin",roles = "ADMIN")
-//@WebMvcTest(UserController.class)
+//TODO Add user tests
 class UserControllerTest {
-   /* private static final Logger log = LoggerFactory.getLogger(UserControllerTest.class);
-    @MockBean
-    private UserRepository userRepository;
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
-    private UserServiceImpl userService;
-    @MockBean
-    private UserModelAssembler assembler;
 
-    //@BeforeEach for junit 5 (@before is junit 4)
-    @BeforeEach
-    void init(){
-        //log.info("Adding test user {}",userRepository.save(new User("testUser","testPwd")));
-    }
-
-    @Test
-    void shouldReturnAllUsers() throws Exception {
-
-
-        mockMvc.perform(get("/users"))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
-
-   // @Test
-    void shouldCreateUser() throws Exception  {
-        User user = new User("newUsername","newPassword");
-        user.setUserId(50L);
-        String jsonUser=objectMapper.writeValueAsString(user);
-        // Log the security context
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //log.info("Mock user: {}", authentication.isAuthenticated());
-        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
-                 .content(jsonUser))
-                .andExpect(status().isCreated())
-                .andDo(print());
-
-    }
-/*
-    @Test
-    void shouldReturnUser() {
-
-
-    }
-
-    @Test
-    void shouldUpdateUser() {
-    }
-
-    @Test
-    void shouldDeleteUser() {
-    }*/
 
 }
