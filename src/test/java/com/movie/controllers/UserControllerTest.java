@@ -3,8 +3,6 @@ package com.movie.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.movie.models.User;
 import com.movie.services.impl.UserServiceImpl;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -19,8 +17,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
-import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -28,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 /**
- * Unit tests for UserController response
+ * Unit tests for UserController response ; usage of a mock service layer with a predictable behavior
  **/
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,21 +37,15 @@ class UserControllerTest {
     private UserServiceImpl userService;
 
     @BeforeEach
-    public void setup() throws Exception{
+    public void setup() throws Exception {
         // Initialize Mockito annotations
         MockitoAnnotations.openMocks(this);
-
-        // Mock UserService saveUser method to actually save user
-        given(userService.saveUser(any(User.class)))
-                .willAnswer(invocation -> invocation.getArgument(0)); // Return the saved user as-is
-
-        // Prepare mock data for getAllUsers
+        // Prepare mock data
         User user1 = new User("user1", "password1");
         user1.setUserId(1L);
         User user2 = new User("user2", "password2");
         user2.setUserId(2L);
         given(userService.getAllUsers()).willReturn(Arrays.asList(user1, user2));
-
         // Mock getUserById for specific user
         given(userService.getUserById(1L)).willReturn(java.util.Optional.of(user1));
     }
@@ -67,38 +59,71 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.userList").exists()) //Check if the userList exists within the JSON response
-                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.userList[*].userId").isNotEmpty());//Verify that the userId exists for every user in the userList.
+                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.userList[*].userId", hasItems(1, 2)));//Verify that the userId are 1 and 2
         //userList key is a result of the serialization of the CollectionModel containing the list of EntityModel<User> objects.
     }
 
     @Test
     @WithMockUser(username = "MockUser", roles = {"USER"})
     public void newUserTest() throws Exception {
+        User newUser = new User("newUser", "newPassword");
+        newUser.setUserId(10L); // Simulating auto-generated ID
+        given(userService.saveUser(any(User.class))).willReturn(newUser);
+
         mvc.perform(MockMvcRequestBuilders
                         .post("/users")
-                        .content(asJsonString(new User("userTest", "pwdTest")))
+                        .content(asJsonString(newUser))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").exists());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(10L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("newUser"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value("newPassword"));
     }
 
 
     @Test
     @WithMockUser(username = "MockUser", roles = {"USER"})
-    public void getUserByIdTest()throws Exception {
-        Long userId = 1L;
-        User user = new User("userTest", "passwordTest");
-        user.setUserId(userId);
-        given(userService.getUserById(userId)).willReturn(Optional.of(user));
-
+    public void getUserByIdTest() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                        .get("/users/{id}", userId)
+                        .get("/users/{id}", 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(userId));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("user1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value("password1"));
+    }
+
+    @Test
+    @WithMockUser(username = "MockUser", roles = {"USER"})
+    public void replaceUserTest() throws Exception {
+        User modifiedUser = new User("modifiedUsername", "modifiedPassword");
+        modifiedUser.setUserId(1L);
+        given(userService.updateUser(any(User.class))).willReturn(modifiedUser);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/users/{id}", 1L)
+                        .content(asJsonString(modifiedUser))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("modifiedUsername"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value("modifiedPassword"));
+    }
+
+    @Test
+    @WithMockUser(username = "MockUser", roles = {"USER"})
+    public void deleteUserTest() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .delete("/users/{id}", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
     }
 
     public static String asJsonString(final Object obj) {

@@ -27,69 +27,68 @@ import com.movie.models.User;
 @RestController
 public class UserController {
 
-	private final UserServiceImpl userService;
-	private final UserModelAssembler assembler;
+    private final UserServiceImpl userService;
+    private final UserModelAssembler assembler;
 
-	public UserController(UserServiceImpl userService, UserModelAssembler assembler) {
-		this.userService = userService;
-		this.assembler = assembler;
-	}
+    public UserController(UserServiceImpl userService, UserModelAssembler assembler) {
+        this.userService = userService;
+        this.assembler = assembler;
+    }
 
-	// Aggregate root
-	// tag::get-aggregate-root[]
-	@GetMapping("/users")
-	public	CollectionModel<EntityModel<User>> all() {
-		List<EntityModel<User>> users = userService.getAllUsers().stream()
-			      .map(assembler::toModel)
-			      .collect(Collectors.toList());
+    // Aggregate root
+    // tag::get-aggregate-root[]
+    @GetMapping("/users")
+    public CollectionModel<EntityModel<User>> all() {
+        List<EntityModel<User>> users = userService.getAllUsers().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
 
-			  return CollectionModel.of(users, linkTo(methodOn(UserController.class).all()).withSelfRel());
-	}
-	// end::get-aggregate-root[]
+        return CollectionModel.of(users, linkTo(methodOn(UserController.class).all()).withSelfRel());
+    }
+    // end::get-aggregate-root[]
 
-	@PostMapping("/users")
-	ResponseEntity<?> newUser(@RequestBody User newUser) {
-		EntityModel<User> entityModel=assembler.toModel( userService.saveUser(newUser));
-		return  ResponseEntity //Additionally, return the model-based version of the saved object.
-	      .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
-	      .body(entityModel);
-	}
+    @PostMapping("/users")
+    ResponseEntity<?> newUser(@RequestBody User newUser) {
+        EntityModel<User> entityModel = assembler.toModel(userService.saveUser(newUser));
+        return ResponseEntity //Additionally, return the model-based version of the saved object.
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+                .body(entityModel);
+    }
 
-	// Single item
-	@GetMapping("/users/{id}")
-	public	EntityModel<User> one(@PathVariable Long id) {
+    // Single item
+    @GetMapping("/users/{id}")
+    public EntityModel<User> one(@PathVariable Long id) {
 
 
-		User user = userService.getUserById(id) //
-		      .orElseThrow(() -> new UserNotFoundException(id));
+        User user = userService.getUserById(id) //
+                .orElseThrow(() -> new UserNotFoundException(id));
 
-		  return assembler.toModel(user);
-		
-	}
+        return assembler.toModel(user);
 
-	@PutMapping("/users/{id}")
-	ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long id) {
+    }
 
-		User updatedUser=userService.getUserById(id).map(user -> {
-			user.setUsername(newUser.getUsername());
-			user.setPassword(newUser.getPassword());
-			return userService.updateUser(user);
-		}).orElseGet(() -> {
-			newUser.setUserId(id);
-			return userService.updateUser(newUser);
-		});
-		EntityModel<User> entityModel = assembler.toModel(updatedUser);
-		return ResponseEntity //
-			      .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
-			      .body(entityModel);
-	}
+    @PutMapping("/users/{id}")
+    ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long id) {
 
-	@DeleteMapping("/users/{id}")
-	ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		userService.deleteUser(id);
-		return ResponseEntity.noContent().build();
-	}
-	
+        User updatedUser = userService.getUserById(id).map(user -> {
+            user.setUsername(newUser.getUsername());
+            user.setPassword(newUser.getPassword());
+            return userService.updateUser(user);
+        }).orElseGet(() -> {
+            newUser.setUserId(id);
+            return userService.updateUser(newUser);
+        });
+        EntityModel<User> entityModel = assembler.toModel(updatedUser);
+        return ResponseEntity //
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+                .body(entityModel);
+    }
 
-	
+    @DeleteMapping("/users/{id}")
+    ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
