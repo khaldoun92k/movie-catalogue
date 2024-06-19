@@ -4,6 +4,7 @@ import com.movie.controllers.exceptions.UserAlreadyExistException;
 import com.movie.models.User;
 import com.movie.repositories.UserRepository;
 import com.movie.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,6 @@ public class UserServiceImpl implements UserService {
 	public UserServiceImpl(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
-
 
 	@Override
 	public User saveUser(User user) {
@@ -65,8 +65,10 @@ public class UserServiceImpl implements UserService {
 	        return  !user.isEmpty();
 	    }
 
+	@Override
+	public void deleteAllUsers() {
+		userRepository.deleteAll();
+	}
 
-	
-	
 
 }
