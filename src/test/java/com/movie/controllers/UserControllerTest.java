@@ -51,7 +51,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "MockUser", roles = {"USER"})
+    @WithMockUser(username = "MockUser")
     public void getAllUsersTest() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                         .get("/users")
@@ -64,7 +64,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "MockUser", roles = {"USER"})
+    @WithMockUser(username = "MockUser")
     public void newUserTest() throws Exception {
         User newUser = new User("newUser", "newPassword");
         newUser.setUserId(10L); // Simulating auto-generated ID
@@ -84,7 +84,7 @@ class UserControllerTest {
 
 
     @Test
-    @WithMockUser(username = "MockUser", roles = {"USER"})
+    @WithMockUser(username = "MockUser")
     public void getUserByIdTest() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                         .get("/users/{id}", 1)
@@ -97,7 +97,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "MockUser", roles = {"USER"})
+    @WithMockUser(username = "MockUser")
     public void replaceUserTest() throws Exception {
         User modifiedUser = new User("modifiedUsername", "modifiedPassword");
         modifiedUser.setUserId(1L);
@@ -116,7 +116,7 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "MockUser", roles = {"USER"})
+    @WithMockUser(username = "MockUser")
     public void deleteUserTest() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                         .delete("/users/{id}", 1L)
