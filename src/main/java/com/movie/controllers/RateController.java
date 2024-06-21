@@ -42,7 +42,7 @@ public class RateController {
 	}
 
 	//record will be used for rating requests
-	private record RatingRequest (Long filmId, Long rating){}
+	public record RatingRequest (Long filmId, Long rating){}
 
 	@CrossOrigin
     @PostMapping("/rating")
