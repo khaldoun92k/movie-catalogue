@@ -32,10 +32,12 @@ public class RateController {
 
 	private final static Logger logger = LogManager.getLogger(RateController.class);
 	private final FilmServiceImpl filmService;
+	private final UserServiceImpl userService;
 	private final RateServiceImpl rateService;
 	private final RateModelAssembler assembler;
 
-	RateController(FilmServiceImpl filmService, RateServiceImpl rateService, RateModelAssembler assembler) {
+	RateController(UserServiceImpl userService,FilmServiceImpl filmService, RateServiceImpl rateService, RateModelAssembler assembler) {
+		this.userService = userService;
 		this.rateService = rateService;
 		this.filmService = filmService;
 		this.assembler = assembler;
@@ -59,8 +61,8 @@ public class RateController {
         logger.info("Principal type: {}", principal.getClass().getName());
         UserDetails userDetails =
         		 (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = (User)userDetails;
-       
+        User currentUser = userService.loadUserByUsername(userDetails.getUsername());
+
         if (filmOpt.isEmpty() || currentUser==null) {
             return ResponseEntity.badRequest().body("Film or User not found!");
         }
@@ -71,8 +73,8 @@ public class RateController {
         newRate.setFilm(filmOpt.get());
         newRate.setRating(ratingRequest.rating);
 		rateService.saveRate(newRate);
-
-        return ResponseEntity.ok("Film rated successfully");
+		String responseMsg=String.format("Film %s is rated %s successfully by user %s",ratingRequest.filmId,ratingRequest.rating,userDetails.getUsername());
+        return ResponseEntity.ok(responseMsg);
     }
     
 	@GetMapping("/rates")
@@ -80,13 +82,14 @@ public class RateController {
 		List<EntityModel<Rate>> rates = rateService.getAllRates().stream()
 			      .map(assembler::toModel)
 			      .collect(Collectors.toList());
-		return CollectionModel.of(rates, linkTo(methodOn(FilmController.class).all()).withSelfRel());
+		return CollectionModel.of(rates, linkTo(methodOn(RateController.class).all()).withSelfRel());
 	}
 	// Single item
-	@GetMapping("/rates/{id}")
-	public	EntityModel<Rate> one(@PathVariable RateId id) {
-		Rate rate = rateService.getRateById(id) //
-		      .orElseThrow(() -> new RateNotFoundException(id));
+	@GetMapping("/rates/{userId}/{filmId}")
+	public EntityModel<Rate> one(@PathVariable Long userId, @PathVariable Long filmId) {
+		RateId rateId = new RateId(userId, filmId);
+		Rate rate = rateService.getRateById(rateId)
+				.orElseThrow(() -> new RateNotFoundException(rateId));
 		return assembler.toModel(rate);
 	}
 
