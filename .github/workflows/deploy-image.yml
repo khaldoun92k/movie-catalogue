@@ -19,6 +19,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Maven build image command
-        run: mvn spring-boot:build-image -P prod -DskipTests -Dmy.secret=${{ secrets.MY_SECRET }}
-        env:
-          MY_SECRET: ${{ secrets.MY_SECRET }}
+        run: mvn spring-boot:build-image -P prod
