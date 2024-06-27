@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      GH_SECRET: ${{ secrets.GH_SECRET }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
