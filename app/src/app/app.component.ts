@@ -10,7 +10,7 @@ import { LoginService } from './service/login.service';
 export class AppComponent {
   title = 'Movie-catalogue';
   isLoggedIn: boolean;
-  private loginSub: Subscription;
+  loginSub: Subscription;
 
   constructor(private loginservice: LoginService) { }
 

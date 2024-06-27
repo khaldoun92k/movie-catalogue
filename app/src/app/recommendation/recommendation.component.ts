@@ -14,9 +14,9 @@ export class RecommendationComponent implements OnInit,OnChanges{
   displayedColumns: string[] = ['title','genre','director'];
   constructor(private recommendationService: RecommendationService) {
   }
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['parentData']) {
-      this.ngOnInit();
+      this.dataSource = this.parentData;
     }
   }
 

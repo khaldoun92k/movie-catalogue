@@ -37,6 +37,7 @@ describe('UserListComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(UserListComponent);
     component = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
     fixture.detectChanges(); // Trigger initial data binding
   });
 
@@ -52,17 +53,21 @@ describe('UserListComponent', () => {
   });
 
   it('should update dataSource when changes', () => {
-    const newmockUsers: User[] = [
+    const newMockUsers: User[] = [
       { userId: 1  ,  username: "user1"  ,  password: "password1"  ,  createdAt:new Date() },
       { userId: 2  ,  username: "user2"  ,  password: "password2"  ,  createdAt:new Date() },
       { userId: 3  ,  username: "user3"  ,  password: "password3"  ,  createdAt:new Date() },
       { userId: 4  ,  username: "user4"  ,  password: "password4"  ,  createdAt:new Date() },
     ];
 
-    });
+    
+    // Simulate the change in data
+    spyOn(userService, 'findAll').and.returnValue(of(newMockUsers));
 
+    component.ngOnInit();
     fixture.detectChanges();
 
     // Since ngOnChanges calls ngOnInit, dataSource should be updated with the service's data, not the newmockUsers
-    expect(component.users).toEqual(mockUsers);
+    expect(component.users).toEqual(newMockUsers);
   });
+});

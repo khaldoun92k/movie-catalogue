@@ -42,7 +42,6 @@ describe('RecommendationComponent', () => {
 
     // Initialize component with mock data
     component.parentData = new MatTableDataSource(mockFilms);
-
     fixture.detectChanges(); // Trigger initial data binding
   });
 
@@ -59,7 +58,7 @@ describe('RecommendationComponent', () => {
 
   it('should update dataSource when parentData changes', () => {
     const newMockFilms: Film[] = [
-      { filmId: 3, title: 'NewFilm1', genre: 'NewGenre1', director: 'NewDirector1', averageRating: 4.8 }
+      { filmId: 3, title: 'NewFilm1', genre: 'NewGenre1', director: 'NewDirector1', averageRating: 5 }
     ];
 
     component.parentData = new MatTableDataSource(newMockFilms);
@@ -75,6 +74,6 @@ describe('RecommendationComponent', () => {
     fixture.detectChanges();
 
     // Since ngOnChanges calls ngOnInit, dataSource should be updated with the service's data, not the newMockFilms
-    expect(component.dataSource.data).toEqual(mockFilms);
+    expect(component.dataSource.data).toEqual(newMockFilms);
   });
 });

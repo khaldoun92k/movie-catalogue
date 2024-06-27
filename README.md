@@ -30,7 +30,7 @@ Afterward to run:
 
 Create docker image (fat image which contain the backend and the frontend) via spring boot packet builder: 
 
-> mvn spring-boot:build-image -P prod -DskipTests
+> mvn spring-boot:build-image -P prod 
 
 Run the image on a container locally: 
 
